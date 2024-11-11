@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html {{ HTML_ATTRS }}>
+  <head {{ HEAD_ATTRS }}>
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-KBGDJHL");
+    </script>
+    <!-- End Google Tag Manager -->
+    <!-- Mindbox BEGIN -->
+    <script>
+      mindbox =
+        window.mindbox ||
+        function () {
+          mindbox.queue.push(arguments);
+        };
+      mindbox.queue = mindbox.queue || [];
+      mindbox("create");
+    </script>
+    <script src="https://api.mindbox.ru/scripts/v1/tracker.js" async></script>
+    <!-- Mindbox END -->
+    <!-- Carrot quest BEGIN -->
+    <script type="text/javascript">
+      if ("<%= process.env.NODE_ENV%>" !== "development") {
+        !(function () {
+          function t(t, e) {
+            return function () {
+              window.carrotquestasync.push(t, arguments);
+            };
+          }
+          if ("undefined" == typeof carrotquest) {
+            var e = document.createElement("script");
+            (e.type = "text/javascript"),
+              (e.async = !0),
+              (e.src = "https://cdn.carrotquest.app/api.min.js"),
+              document.getElementsByTagName("head")[0].appendChild(e),
+              (window.carrotquest = {}),
+              (window.carrotquestasync = []),
+              (carrotquest.settings = {});
+            for (
+              var n = [
+                  "connect",
+                  "track",
+                  "identify",
+                  "auth",
+                  "onReady",
+                  "addCallback",
+                  "removeCallback",
+                  "trackMessageInteraction",
+                ],
+                a = 0;
+              a < n.length;
+              a++
+            )
+              carrotquest[n[a]] = t(n[a]);
+          }
+        })(),
+          carrotquest.connect("53698-5ca8753fa2f060b60a44270481");
+      }
+    </script>
+    <!-- Carrot quest END -->
+    <!-- Yandex.Metrika counter START -->
+    <script type="text/javascript">
+      (function (m, e, t, r, i, k, a) {
+        m[i] =
+          m[i] ||
+          function () {
+            (m[i].a = m[i].a || []).push(arguments);
+          };
+        m[i].l = 1 * new Date();
+        for (var j = 0; j < document.scripts.length; j++) {
+          if (document.scripts[j].src === r) {
+            return;
+          }
+        }
+        (k = e.createElement(t)),
+          (a = e.getElementsByTagName(t)[0]),
+          (k.async = 1),
+          (k.src = r),
+          a.parentNode.insertBefore(k, a);
+      })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+      ym(53473642, "init", {
+        clickmap: true,
+        trackLinks: true,
+        accurateTrackBounce: true,
+        webvisor: true,
+      });
+    </script>
+    <!-- Yandex.Metrika counter END -->
+    {{ HEAD }}
+  </head>
+  <body {{ BODY_ATTRS }}>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-KBGDJHL"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+    <!-- START Yandex.Metrika counter (noscript) -->
+    <noscript
+      ><div><img src="https://mc.yandex.ru/watch/53473642" style="position: absolute; left: -9999px" alt="" /></div
+    ></noscript>
+    <!-- END Yandex.Metrika counter (noscript) -->
+    <!-- End Google Tag Manager (noscript) -->
+    {{ APP }}
+  </body>
+</html>

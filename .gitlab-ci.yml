@@ -1,0 +1,80 @@
+stages:
+  - build
+  - deploy
+
+
+.build_template: &build_configuration
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
+  script:
+    - mkdir -p /kaniko/.docker
+    # Install jq.
+    - wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && chmod +x ./jq && cp jq /kaniko
+    # Get a service account token from metadata.
+    - wget --header Metadata-Flavor:Google 169.254.169.254/computeMetadata/v1/instance/service-accounts/default/token && cp token /kaniko
+    - echo "{\"auths\":{\"cr.yandex\":{\"auth\":\"$(printf "%s:%s" "iam" "$(cat /kaniko/token | ./jq -r '.access_token')" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - >-
+      /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/${DOCKERFILE}"
+      --destination "${DESTINATION}"
+      --cache=true
+    # Delete the metadata file.
+    - rm /kaniko/token
+
+
+build-frontend-stage:
+  variables:
+    DOCKERFILE: stage.Dockerfile
+    DESTINATION: cr.yandex/$STAGE_REGISTRY/st-stage-frontend:$CI_COMMIT_SHORT_SHA
+  only:
+    - stage
+  tags:
+    - smart-tables
+  <<: *build_configuration
+
+build-frontend-prod:
+  variables:
+    DOCKERFILE: prod.Dockerfile
+    DESTINATION: cr.yandex/$PROD_REGISTRY/st-prod-frontend:$CI_COMMIT_SHORT_SHA
+  only:
+    - prod
+  tags:
+    - smart-tables-prod
+  <<: *build_configuration
+
+
+.deploy_template: &deploy_configuration
+  stage: deploy
+  image: alpine/k8s:1.22.6
+  script:
+    - kubectl config get-contexts
+    - echo "$VALUES" > $CI_PROJECT_DIR/values.yaml
+    - echo "$KUBERNETES" > $CI_PROJECT_DIR/config_helm
+    - export KUBECONFIG=$CI_PROJECT_DIR/config_helm
+    - helm upgrade -n smart-tables -f $CI_PROJECT_DIR/values.yaml st-frontend ./helm --install --set image="$IMAGE"
+
+
+deploy-frontend-stage:
+  variables:
+    VALUES: $STAGE_VALUES
+    KUBERNETES: $STAGE_KUBE_CONFIG
+    IMAGE: cr.yandex/$STAGE_REGISTRY/st-stage-frontend:$CI_COMMIT_SHORT_SHA
+  only:
+    - stage
+  tags:
+    - smart-tables
+  <<: *deploy_configuration
+
+deploy-frontend-prod:
+  variables:
+    VALUES: $PROD_VALUES
+    KUBERNETES: $PROD_KUBE_CONFIG
+    IMAGE: cr.yandex/$PROD_REGISTRY/st-prod-frontend:$CI_COMMIT_SHORT_SHA
+  only:
+    - prod
+  tags:
+    - smart-tables-prod
+  <<: *deploy_configuration
